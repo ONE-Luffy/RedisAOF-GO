@@ -4,6 +4,7 @@ import (
 	 "fmt"
 		"github.com/go-redis/redis"
 	"strings"
+	"strconv"
 )
 var client *redis.Client
 
@@ -35,10 +36,24 @@ func ExampleClient() {
 	} else {
 		fmt.Println("Key2", val2)
 	}
-	val3 := client.Info("Persistence")
+	val3, err := client.Info("Persistence").Result()
+	rows := strings.Split(val3, "\n")
+	rows = append(rows[:0], rows[1:17]... )
 
 	fmt.Println(val3)
 
-	val3 := map[string]string{}
+	m := make(map[string]int)
+	for i := 0; i < len(rows); i++ {
+		col := strings.Split(rows[i], ":")
+		//fmt.Println(col[0])
+		//fmt.Println(col[1])
+		b, _ := strconv.Atoi(col[1])
+		m[col[0]] = b
+		fmt.Println(m[col[0]])
+	}
+	if m["aof_enabled"] == 0 {
+
+
+	}
 
 }
